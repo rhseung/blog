@@ -6,3 +6,6 @@
 
 .trash/
 .DS_Store
+
+.makemd/
+.space/
