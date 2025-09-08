@@ -1,0 +1,35 @@
+name: Trigger Portfolio Vercel Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**/*.md"
+      - "**/*.mdx"
+      - "assets/**"
+      - "!README.md"
+
+concurrency:
+  group: vercel-deploy-portfolio
+  cancel-in-progress: true
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip if commit opts out
+        if: contains(github.event.head_commit.message, '[skip-deploy]')
+        run: echo "skip requested" && exit 78
+
+      - name: Trigger Vercel Deploy Hook
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$VERCEL_DEPLOY_HOOK" ]; then
+            echo "VERCEL_DEPLOY_HOOK secret is missing" >&2
+            exit 1
+          fi
+          curl -sS -X POST "$VERCEL_DEPLOY_HOOK" \
+            -H "Content-Type: application/json" \
+            -d "{\"source\":\"blog\",\"sha\":\"${GITHUB_SHA}\"}"
+          echo "Dispatched Vercel deploy."
