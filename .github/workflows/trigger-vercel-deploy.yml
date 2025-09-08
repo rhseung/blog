@@ -2,7 +2,7 @@ name: Trigger Portfolio Vercel Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - "**/*.md"
       - "**/*.mdx"
